@@ -10,26 +10,6 @@ SHELL ["/bin/bash", "-c"]
 RUN \
     set -x; \
     echo "Starting image build for Debian" \
- && echo "Starting image build for Debian" \
- && sed -ri "s/(httpredir|deb).debian.org/${APT_MIRROR:-deb.debian.org}/g" /etc/apt/sources.list \
- && sed -ri "s/(security).debian.org/${APT_MIRROR:-security.debian.org}/g" /etc/apt/sources.list \
- && apt-get update \
- && apt-get install --no-install-recommends -y -q \
-    software-properties-common \
-    curl \
-    gnupg2 \
- && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key add - \
- && echo "deb [arch=$TARGETARCH] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list \
- && apt-get update \
- && apt-get install --no-install-recommends -y -q \
-    docker-ce \
-    docker-ce-cli \
-    make \
-    git-core \
-    wget \
-    xz-utils \
-    cmake \
-    openssl \
  && dpkg --add-architecture amd64 \
  && dpkg --add-architecture arm64 \
  && dpkg --add-architecture armel \
@@ -42,6 +22,12 @@ RUN \
  && dpkg --add-architecture s390x \
  && apt-get update \
  && apt-get install --no-install-recommends -y -q \
+        make \
+        git-core \
+        wget \
+        xz-utils \
+        cmake \
+        openssl \
         autoconf \
         automake \
         bc \
