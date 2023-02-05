@@ -5,7 +5,7 @@ on:
       - v*
 
 jobs:
-  release-toolchains:
+  release-golang:
     runs-on: ubuntu-latest
     steps:
       - name: Login to GitHub Container Registry
@@ -44,7 +44,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          file: Dockerfile.base
+          file: Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
