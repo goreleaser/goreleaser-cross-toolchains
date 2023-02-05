@@ -42,7 +42,7 @@ toolchain-%:
 		-f Dockerfile .
 
 .PHONY: toolchains
-toolchains: $(patsubst %, toolchains-%,$(SUBIMAGES))
+toolchains: $(patsubst %, toolchain-%,$(SUBIMAGES))
 
 .PHONY: docker-push-%
 docker-push-toolchains-%:

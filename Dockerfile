@@ -61,7 +61,7 @@ RUN \
  && rm -rf /var/lib/apt/lists/* \
     /tmp/* \
     /var/tmp/* \
-    rm -rf /usr/share/man/* \
+ && rm -rf /usr/share/man/* \
     /usr/share/doc
 
 # install a copy of mingw with aarch64 support to enable windows on arm64
