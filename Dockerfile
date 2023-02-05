@@ -1,5 +1,3 @@
-# golang parameters
-ARG GO_VERSION
 FROM debian:bullseye AS toolchains-base
 
 ENV OSX_CROSS_PATH=/osxcross

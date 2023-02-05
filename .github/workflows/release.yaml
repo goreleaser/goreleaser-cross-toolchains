@@ -48,8 +48,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            "GO_VERSION=${{env.GO_VERSION}}"
-            "TINI_VERSION=${{env.TINI_VERSION}}"
-            "COSIGN_VERSION=${{env.COSIGN_VERSION}}"
-            "COSIGN_SHA256=${{env.COSIGN_SHA256}}"
-            "DEBIAN_FRONTEND=${{env.DEBIAN_FRONTEND}}"
+            "OSX_SDK=${{env.OSX_SDK}}"
+            "OSX_SDK_SUM=${{env.OSX_SDK_SUM}}"
+            "OSX_VERSION_MIN=${{env.OSX_VERSION_MIN}}"
+            "OSX_CROSS_COMMIT=${{env.OSX_CROSS_COMMIT}}"
