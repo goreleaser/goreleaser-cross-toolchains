@@ -5,7 +5,7 @@ on:
       - v*
 
 jobs:
-  release-golang:
+  release-toolchains:
     runs-on: ubuntu-latest
     steps:
       - name: Login to GitHub Container Registry
@@ -48,7 +48,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            "OSX_SDK=${{env.OSX_SDK}}"
-            "OSX_SDK_SUM=${{env.OSX_SDK_SUM}}"
-            "OSX_VERSION_MIN=${{env.OSX_VERSION_MIN}}"
-            "OSX_CROSS_COMMIT=${{env.OSX_CROSS_COMMIT}}"
+            DPKG_ARCH=${{env.DPKG_ARCH}}
+            CROSSBUILD_ARCH=${{env.CROSSBUILD_ARCH}}
+            OSXCROSS_VERSION=${{env.OSXCROSS_VERSION}}
