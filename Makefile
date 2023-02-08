@@ -41,7 +41,9 @@ docker-push: $(patsubst %, docker-push-%,$(SUBIMAGES))
 .PHONY: manifest-create
 manifest-create:
 	@echo "creating manifest $(IMAGE_NAME)"
-	docker manifest create $(IMAGE_NAME) $(foreach arch,$(SUBIMAGES), --amend $(IMAGE_NAME)-$(arch))
+	docker manifest rm $(IMAGE_NAME) 2>/dev/null || true
+	docker manifest create $(IMAGE_NAME) \
+		$(foreach arch,$(SUBIMAGES), $(shell docker inspect $(IMAGE_NAME)-$(arch) | jq -r '.[].RepoDigests | .[]'))
 
 .PHONY: manifest-push
 manifest-push:

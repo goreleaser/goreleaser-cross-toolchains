@@ -68,4 +68,4 @@ RUN \
 
 COPY --from=osxcross "${OSXCROSS_PATH}" "${OSXCROSS_PATH}"
 
-ENV PATH=${OSX_CROSS_PATH}/bin:$PATH
+ENV PATH=${OSX_CROSS_PATH}/target/bin:$PATH
