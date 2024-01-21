@@ -54,6 +54,7 @@ RUN \
         libarchive-tools \
         gdb \
         mingw-w64 \
+        libx11-dev \
         ${crossbuild_pkgs}\
  && apt -y autoremove \
  && apt-get clean \
