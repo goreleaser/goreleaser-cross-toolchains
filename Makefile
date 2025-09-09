@@ -1,27 +1,30 @@
 include .env
 
-REGISTRY           ?= ghcr.io
-TAG_VERSION        ?= $(shell git describe --tags --abbrev=0)
-IMAGE_NAME         := goreleaser/goreleaser-cross-toolchains:$(TAG_VERSION)
+REGISTRIES         ?= ghcr.io \
+docker.io
 
-ifneq ($(REGISTRY),)
-	IMAGE_NAME     := $(REGISTRY)/$(IMAGE_NAME)
-endif
+SUBIMAGES          ?= arm64 \
+amd64
+
+TOOLS              := ./scripts/tools.sh
+
+TAG_VERSION        ?= $(shell git describe --tags --abbrev=0)
+
+IMAGE_NAMES        := $(shell $(TOOLS) generate tags cross-toolchains $(TAG_VERSION) "$(REGISTRIES)")
 
 DOCKER_BUILD=docker build
 
-SUBIMAGES ?= amd64 \
-arm64
+SUBIMAGES ?= arm64 \
+amd64
 
 .PHONY: gen-changelog
 gen-changelog:
 	@echo "generating changelog to changelog"
 	./scripts/genchangelog.sh $(shell git describe --tags --abbrev=0) changelog.md
 
-.PHONY: toolchain-%
-toolchain-%:
-	@echo "building $(IMAGE_NAME)-$(@:toolchain-%=%)"
-	$(DOCKER_BUILD) --platform=linux/$(@:toolchain-%=%) -t $(IMAGE_NAME)-$(@:toolchain-%=%) \
+.PHONY: toolchains-%
+toolchains-%:
+	$(DOCKER_BUILD) --platform=linux/$* $(foreach IMAGE,$(IMAGE_NAMES), -t $(IMAGE)-$*) \
 		--build-arg DPKG_ARCH=$(DPKG_ARCH) \
 		--build-arg CROSSBUILD_ARCH=$(CROSSBUILD_ARCH) \
 		--build-arg OSXCROSS_VERSION="$(OSXCROSS_VERSION)" \
@@ -29,7 +32,7 @@ toolchain-%:
 		-f Dockerfile .
 
 .PHONY: toolchains
-toolchains: $(patsubst %, toolchain-%,$(SUBIMAGES))
+toolchains: $(patsubst %, toolchains-%,$(SUBIMAGES))
 
 .PHONY: docker-push-%
 docker-push-%:
@@ -41,7 +44,9 @@ docker-push: $(patsubst %, docker-push-%,$(SUBIMAGES))
 .PHONY: manifest-create
 manifest-create:
 	@echo "creating manifest $(IMAGE_NAME)"
-	docker manifest create $(IMAGE_NAME) $(foreach arch,$(SUBIMAGES), --amend $(IMAGE_NAME)-$(arch))
+	docker manifest rm $(IMAGE_NAME) 2>/dev/null || true
+	docker manifest create $(IMAGE_NAME) \
+		$(foreach arch,$(SUBIMAGES), $(shell docker inspect $(IMAGE_NAME)-$(arch) | jq -r '.[].RepoDigests | .[0]'))
 
 .PHONY: manifest-push
 manifest-push:
@@ -55,3 +60,7 @@ tags:
 .PHONY: tag
 tag:
 	@echo $(TAG_VERSION)
+
+.PHONY: release
+release: toolchains docker-push manifest-create manifest-push
+
