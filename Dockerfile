@@ -1,6 +1,6 @@
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_MIRROR
-ARG OSXCROSS_VERSION="v12.0.0"
+ARG OSXCROSS_VERSION="v26.0.0"
 
 FROM ghcr.io/goreleaser/goreleaser-osxcross:$OSXCROSS_VERSION AS osxcross
 
