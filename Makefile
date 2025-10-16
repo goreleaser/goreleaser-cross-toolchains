@@ -36,22 +36,30 @@ toolchains: $(patsubst %, toolchains-%,$(SUBIMAGES))
 
 .PHONY: docker-push-%
 docker-push-%:
-	docker push $(IMAGE_NAME)-$(@:docker-push-%=%)
+	@$(foreach IMAGE,$(IMAGE_NAMES), docker push $(IMAGE)-$*;)
 
 .PHONY: docker-push
 docker-push: $(patsubst %, docker-push-%,$(SUBIMAGES))
 
 .PHONY: manifest-create
 manifest-create:
-	@echo "creating manifest $(IMAGE_NAME)"
-	docker manifest rm $(IMAGE_NAME) 2>/dev/null || true
-	docker manifest create $(IMAGE_NAME) \
-		$(foreach arch,$(SUBIMAGES), $(shell docker inspect $(IMAGE_NAME)-$(arch) | jq -r '.[].RepoDigests | .[0]'))
+	@echo "creating manifests"
+	@$(foreach IMAGE,$(IMAGE_NAMES),docker manifest rm $(IMAGE) 2>/dev/null || true;)
+	@$(foreach IMAGE, $(IMAGE_NAMES), \
+		docker manifest create $(IMAGE) $(foreach arch,$(SUBIMAGES), \
+		$$(docker inspect $(IMAGE)-$(arch) | jq -r --arg image $$(echo $(IMAGE)-$(arch) | cut -d ':' -f 1) '.[].RepoDigests[] | select(. | startswith($$image))'));)
+#
+#
+#	docker manifest rm $(IMAGE_NAME) 2>/dev/null || true
+#	docker manifest create $(IMAGE_NAME) \
+#		$(foreach arch,$(SUBIMAGES), $(shell docker inspect $(IMAGE_NAME)-$(arch) | jq -r '.[].RepoDigests | .[0]'))
 
 .PHONY: manifest-push
 manifest-push:
-	@echo "pushing manifest $(IMAGE_NAME)"
-	docker manifest push $(IMAGE_NAME)
+	@echo "pushing manifests"
+	@$(foreach IMAGE,$(IMAGE_NAMES),docker manifest push $(IMAGE);)
+
+#	docker manifest push $(IMAGE_NAME)
 
 .PHONY: tags
 tags:

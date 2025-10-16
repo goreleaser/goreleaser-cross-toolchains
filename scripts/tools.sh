@@ -91,6 +91,7 @@ function generate_tags {
 	tag_minor=v$("$SEMVER" get major "$tag").$("$SEMVER" get minor "$tag")
 
 	local images
+	images=()
 
 	for registry in "${registries[@]}"; do
 		image=$pkg
@@ -99,17 +100,29 @@ function generate_tags {
 		fi
 
 		if [[ $(is_prerelease "$tag") == true ]]; then
-			images="$image:$tag"
+			images+=("$image:$tag")
 		else
-			images="$image:$tag_minor"
-			images+=$'\n'"$image:$tag"
+			images+=("$image:$tag_minor")
+			images+=("$image:$tag")
+#			images+=$'\n'"$image:$tag"
 			if [[ $latest == true ]]; then
-				images+=$'\n'"$image:latest"
+#				images+=$'\n'"$image:latest"
+				images+=("$image:latest")
 			fi
 		fi
 	done
 
-	echo "$images"
+	local res
+
+	for img in "${images[@]}"; do
+		if [[ "$res" != "" ]]; then
+			res+=$'\n'
+		fi
+		res+="$img"
+	done
+
+
+	echo "$res"
 
 	exit 0
 }
