@@ -4,7 +4,7 @@ ARG OSXCROSS_VERSION="v26.0.0"
 
 FROM ghcr.io/goreleaser/goreleaser-osxcross:$OSXCROSS_VERSION AS osxcross
 
-FROM ubuntu:noble AS base
+FROM ubuntu:noble@sha256:7a398144c5a2fa7dbd9362e460779dc6659bd9b19df50f724250c62ca7812eb3 AS base
 
 ARG TARGETARCH
 COPY ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources
