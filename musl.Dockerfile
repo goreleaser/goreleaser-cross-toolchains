@@ -1,4 +1,4 @@
-ARG OSXCROSS_VERSION="v26.0.0"
+ARG OSXCROSS_VERSION="v26.1.1"
 
 FROM ghcr.io/goreleaser/goreleaser-osxcross-musl:$OSXCROSS_VERSION AS osxcross
 

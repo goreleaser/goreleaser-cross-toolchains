@@ -1,10 +1,13 @@
-include .env
-export
+GORELEASER_ARGS :=
 
-.PHONY: release-dryrun
-release-dryrun:
-	goreleaser release -f .goreleaser.yaml --clean --parallelism=1 --skip=publish,validate --snapshot
+ifeq (,$(findstring release,$(BUILDOPTS)))
+	GORELEASER_ARGS += --skip=publish,validate --snapshot
+endif
+
+ifneq (,$(findstring verbose,$(BUILDOPTS)))
+	GORELEASER_ARGS += --verbose
+endif
 
 .PHONY: release
 release:
-	goreleaser release -f .goreleaser.yaml --clean --parallelism=1
+	goreleaser release -f .goreleaser.yaml --timeout=2h --clean $(GORELEASER_ARGS)

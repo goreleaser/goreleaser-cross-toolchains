@@ -5,7 +5,7 @@ builds:
   - skip: true
 
 # NOTE: needs to be run with `--parallelism=1`, as goreleaser and
-# goreleaser-pro depends on base.
+# goreleaser-pro depend on base.
 dockers_v2:
   - id: toolchains
     images:
@@ -25,30 +25,43 @@ dockers_v2:
       OSXCROSS_VERSION: "{{ .Env.OSXCROSS_VERSION }}"
       DEBIAN_FRONTEND: "{{ .Env.DEBIAN_FRONTEND }}"
       DPKG_ARCH: '{{ trim (trimprefix (trimsuffix .Env.DPKG_ARCH "\"") "\"") }}'
+      # yamllint disable-line rule:line-length
       CROSSBUILD_ARCH: '{{ trim (trimprefix (trimsuffix .Env.CROSSBUILD_ARCH "\"") "\"") }}'
-  - id: toolchains-musl
-    images:
-      - "goreleaser/goreleaser-cross-toolchains"
-      - "ghcr.io/goreleaser/goreleaser-cross-toolchains"
-    tags:
-      - "{{ .Tag }}-musl"
-      - "v{{ .Major }}.{{ .Minor }}-musl"
-      - "latest-musl"
-    dockerfile: musl.Dockerfile
-    platforms:
-      - linux/amd64
-      - linux/arm64
-    extra_files:
-      - cross-make
-    build_args:
-      OSXCROSS_VERSION: "{{ .Env.OSXCROSS_VERSION }}"
-      MUSL_TARGETS: '{{ trim (trimprefix (trimsuffix .Env.MUSL_TARGETS "\"") "\"") }}'
+#  - id: toolchains-musl
+#    images:
+#      - "goreleaser/goreleaser-cross-toolchains"
+#      - "ghcr.io/goreleaser/goreleaser-cross-toolchains"
+#    tags:
+#      - "{{ .Tag }}-musl"
+#      - "v{{ .Major }}.{{ .Minor }}-musl"
+#      - "latest-musl"
+#    dockerfile: musl.Dockerfile
+#    platforms:
+#      - linux/amd64
+#      - linux/arm64
+#    extra_files:
+#      - cross-make
+#    build_args:
+#      OSXCROSS_VERSION: "{{ .Env.OSXCROSS_VERSION }}"
+#      # yamllint disable-line rule:line-length
+#      MUSL_TARGETS: '{{ trim (trimprefix (trimsuffix .Env.MUSL_TARGETS "\"") "\"") }}'
+
 docker_signs:
   - cmd: cosign
+    if: '{{ eq .Env.COSIGN_MODE "local" }}'
     output: true
     args:
       - "sign"
-      - "${artifact}"
+      - "--key"
+      - "cosign.key"
+      - "${artifact}@${digest}"
+      - "--yes"
+  - cmd: cosign
+    if: '{{ neq .Env.COSIGN_MODE "local" }}'
+    output: true
+    args:
+      - "sign"
+      - "${artifact}@${digest}"
       - "--yes"
 
 changelog:
