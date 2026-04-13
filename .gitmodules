@@ -1,0 +1,3 @@
+[submodule "cross-make"]
+	path = cross-make
+	url = git@github.com:zijiren233/cross-make

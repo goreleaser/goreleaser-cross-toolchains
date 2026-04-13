@@ -132,7 +132,7 @@ function generate() {
 		tags)
 			shift
 			case $1 in
-				cross-toolchains)
+				cross-toolchains*)
 					name=$1
 					shift
 					generate_tags "goreleaser-$name" "$1" "$2"

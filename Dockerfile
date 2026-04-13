@@ -9,11 +9,10 @@ FROM ubuntu:noble AS base
 ARG TARGETARCH
 COPY ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources
 
-ARG TARGETARCH
-ARG DPKG_ARCH
-ARG CROSSBUILD_ARCH
+ARG DPKG_ARCH="amd64 arm64 armel armhf i386 mips mipsel powerpc ppc64el s390x riscv64"
+ARG CROSSBUILD_ARCH="amd64 arm64 armel armhf i386 mipsel ppc64el s390x riscv64"
 ARG OSX_CROSS_PATH=/usr/local/osxcross
-ARG MINGW_VERSION=20251021
+ARG MINGW_VERSION=20260324
 ARG MINGW_HOST="ubuntu-22.04"
 
 ENV DEBIAN_FRONTEND="noninteractive"
@@ -48,7 +47,6 @@ RUN \
         multistrap \
         patch \
         mercurial \
-        musl-tools \
  && while read arch; do dpkg --add-architecture $arch; done < <(echo "${DPKG_ARCH}" | tr ' ' '\n') \
  && crossbuild_pkgs=$(while read arch; do echo -n "crossbuild-essential-$arch "; done < <(echo "${CROSSBUILD_ARCH}" | tr ' ' '\n')) \
  && apt-get update \
